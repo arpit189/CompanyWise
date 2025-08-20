@@ -1,0 +1,468 @@
+/* LeetCode Company Finder Styles */
+
+/* Floating Icon */
+.lecf-btn {
+    position: fixed;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+    background: #ffffff;
+    cursor: grab;
+    z-index: 999999;
+    transition: transform 120ms ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.lecf-btn:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+.lecf-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(16, 24, 40, 0.12);
+}
+
+/* Icon image */
+.lecf-btn img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+#leetcode-company-finder-icon:hover {
+    background: #2a2a2a;
+    border-color: #6a6a6a;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+#leetcode-company-finder-icon.active {
+    background: #007acc;
+    border-color: #005a9e;
+}
+
+#leetcode-company-finder-icon:focus {
+    outline: 2px solid #007acc;
+    outline-offset: 2px;
+}
+
+#leetcode-company-finder-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Panel */
+.lecf-panel {
+    position: fixed;
+    right: calc(12px + 44px);
+    top: 50%;
+    transform: translateY(-50%) translateX(8px);
+    width: 320px;
+    max-width: 90vw;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.12);
+    padding: 12px;
+    z-index: 999998;
+    color: #111827;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 140ms ease, transform 140ms ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.lecf-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Panel Header */
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 8px 8px 0 0;
+    margin: -12px -12px 12px -12px;
+}
+
+.panel-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel-close:hover {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.panel-close:focus {
+    outline: 2px solid #007acc;
+    outline-offset: 2px;
+}
+
+/* Panel Content */
+.panel-content {
+    padding: 16px 20px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.panel-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.panel-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.panel-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.panel-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Error State */
+.error {
+    text-align: center;
+    color: #d32f2f;
+    padding: 20px;
+}
+
+.error p {
+    margin: 0 0 12px 0;
+}
+
+.retry-btn {
+    background: #d32f2f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
+
+.retry-btn:hover {
+    background: #b71c1c;
+}
+
+/* Not Found State */
+.not-found {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+
+.not-found p {
+    margin: 0 0 8px 0;
+}
+
+/* Companies List */
+.companies-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.company-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.company-row:hover {
+    background: rgba(31, 159, 255, 0.06);
+    border-color: rgba(31, 159, 255, 0.2);
+}
+
+.company-row:focus {
+    outline: 2px solid #1f9fff;
+    outline-offset: 2px;
+}
+
+.company-row:active {
+    transform: scale(0.98);
+}
+
+.company-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.company-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.company-frequency {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Company Avatar */
+.company-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.company-logo {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Panel Footer */
+.panel-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    gap: 6px;
+    margin: 12px -12px -12px -12px;
+    flex-wrap: wrap;
+}
+
+.refresh-btn,
+.open-site-btn,
+.reset-position-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 6px 10px;
+    border: 1px solid #1f9fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    color: #1f9fff;
+}
+
+.refresh-btn:hover,
+.open-site-btn:hover,
+.reset-position-btn:hover {
+    background: #1f9fff;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(31, 159, 255, 0.3);
+}
+
+.refresh-btn:focus,
+.open-site-btn:focus,
+.reset-position-btn:focus {
+    outline: 2px solid #1f9fff;
+    outline-offset: 2px;
+}
+
+.refresh-btn:active,
+.open-site-btn:active,
+.reset-position-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .lecf-panel {
+        width: 300px;
+        right: calc(12px + 44px);
+    }
+    
+    .panel-header,
+    .panel-content,
+    .panel-footer {
+        padding: 10px 14px;
+    }
+    
+    .panel-title {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .lecf-panel {
+        width: 280px;
+        right: calc(8px + 44px);
+    }
+    
+    .panel-footer {
+        flex-direction: column;
+    }
+    
+    .lecf-btn {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .lecf-btn img {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Dark mode support for LeetCode */
+@media (prefers-color-scheme: dark) {
+    .lecf-btn {
+        background: #2a2a2a;
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    .lecf-btn:hover {
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    }
+    
+    .lecf-panel {
+        background: #1a1a1a;
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .panel-header {
+        background: rgba(42, 42, 42, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .panel-title {
+        color: #ffffff;
+    }
+    
+    .panel-close {
+        color: #ccc;
+    }
+    
+    .panel-close:hover {
+        background: #333;
+        color: #ffffff;
+    }
+    
+    .company-row {
+        color: #ffffff;
+    }
+    
+    .company-row:hover {
+        background: rgba(31, 159, 255, 0.15);
+        border-color: rgba(31, 159, 255, 0.4);
+    }
+    
+    .company-name {
+        color: #ffffff;
+    }
+    
+    .company-frequency {
+        color: #ccc;
+    }
+    
+    .panel-footer {
+        background: rgba(42, 42, 42, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .refresh-btn,
+    .open-site-btn,
+    .reset-position-btn {
+        background: #2a2a2a;
+        border-color: #1f9fff;
+        color: #1f9fff;
+    }
+    
+    .refresh-btn:hover,
+    .open-site-btn:hover,
+    .reset-position-btn:hover {
+        background: #1f9fff;
+        color: #ffffff;
+    }
+    
+    .loading,
+    .not-found {
+        color: #ccc;
+    }
+}
+
+/* Focus styles for accessibility */
+#leetcode-company-finder-panel:focus {
+    outline: none;
+}
+
+/* Animation for panel appearance */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+#leetcode-company-finder-panel.open {
+    animation: slideIn 0.3s ease;
+}

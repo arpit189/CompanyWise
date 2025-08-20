@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "LeetCode Company Finder",
+  "version": "1.0",
+  "description": "Floating icon on LeetCode problems — show companies & frequency from Company-wise LeetCode dataset.",
+  "icons": {
+  "16": "icon-16.png",
+  "48": "icon-48.png",
+  "128": "icon-128.png"
+},
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://company-wise-leetcode-farneet.netlify.app/*",
+    "https://raw.githubusercontent.com/*/*/master/*",
+    "https://leetcode.com/*",
+    "https://*.leetcode.com/*",
+    "https://leetcode.cn/*",
+    "https://*.leetcode.cn/*"
+  ],
+  "action": {
+  "default_icon": {
+    
+     "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+   
+  },
+  "default_title": "LeetCode Company Finder"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/*", "https://*.leetcode.com/*", "https://leetcode.cn/*", "https://*.leetcode.cn/*"],
+      "js": ["content.js"],
+      "css": ["panel.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": { "service_worker": "background.js" }
+}

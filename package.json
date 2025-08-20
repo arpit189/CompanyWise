@@ -1,0 +1,48 @@
+{
+  "name": "leetcode-company-finder-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension that shows company-frequency data for LeetCode problems",
+  "main": "content.js",
+  "scripts": {
+    "test": "node test-slug-extraction.js",
+    "build": "echo 'No build process required for Chrome extension'",
+    "package": "powershell -Command \"Compress-Archive -Path .\\* -DestinationPath leetcode-company-finder.zip -Force\"",
+    "clean": "if exist leetcode-company-finder.zip del leetcode-company-finder.zip"
+  },
+  "keywords": [
+    "chrome-extension",
+    "leetcode",
+    "companies",
+    "interview",
+    "coding",
+    "problems",
+    "frequency"
+  ],
+  "author": "LeetCode Company Finder Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/leetcode-company-finder-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/leetcode-company-finder-extension/issues"
+  },
+  "homepage": "https://github.com/your-username/leetcode-company-finder-extension#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "manifest": {
+    "version": 3,
+    "permissions": ["storage"],
+    "host_permissions": [
+      "https://company-wise-leetcode-farneet.netlify.app/*",
+      "https://raw.githubusercontent.com/*/*/master/*",
+      "https://leetcode.com/*",
+      "https://*.leetcode.com/*",
+      "https://leetcode.cn/*",
+      "https://*.leetcode.cn/*"
+    ]
+  }
+}
