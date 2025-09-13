@@ -48,7 +48,7 @@ class LeetCodeCompanyFinder {
     }
 
     extractProblemSlug() {
-        const url = window.location.href;
+        // const url = window.location.href;
         const path = window.location.pathname;
         
         // Primary: extract from URL path /problems/<slug>/
@@ -159,141 +159,160 @@ class LeetCodeCompanyFinder {
         }
     }
 
+    // --- createFloatingIcon: pinned to RIGHT and vertically centered by default ---
     createFloatingIcon() {
         this.floatingIcon = document.createElement('div');
         this.floatingIcon.id = 'leetcode-company-finder-icon';
         this.floatingIcon.className = 'lecf-btn';
         this.floatingIcon.innerHTML = `
-            <img src="${chrome.runtime.getURL('icon-48.png')}" alt="Company Finder" width="24" height="24">
+            <img src="${chrome.runtime.getURL('icon.svg')}" alt="Company Finder" width="24" height="24">
         `;
         this.floatingIcon.title = 'Companies that asked this problem';
         this.floatingIcon.setAttribute('role', 'button');
         this.floatingIcon.setAttribute('tabindex', '0');
         this.floatingIcon.setAttribute('aria-label', 'Show companies for this problem');
-        
+
+        // Force fixed positioning on the right (use setProperty with important to override CSS)
+        this.floatingIcon.style.position = 'fixed';
+        this.floatingIcon.style.setProperty('right', '12px', 'important'); // pinned to right
+        this.floatingIcon.style.setProperty('left', 'auto', 'important');   // ensure left is cleared
+        this.floatingIcon.style.top = '50%';
+        this.floatingIcon.style.transform = 'translateY(-50%)';
+
         document.body.appendChild(this.floatingIcon);
-        
-        // Load saved position
+
+        // Load saved position (migrates left->right if needed)
         this.loadIconPosition();
-        
+
         // Add drag functionality
         this.addDragHandlers();
     }
 
+    // --- loadIconPosition: read saved right + top (px) and migrate left->right if necessary ---
     async loadIconPosition() {
         try {
             const result = await chrome.storage.local.get(['lecfPos']);
-            if (result && result.lecfPos) {
-                const {right, top} = result.lecfPos;
-                this.floatingIcon.style.right = right + 'px';
-                this.floatingIcon.style.top = top + 'px';
-                this.floatingIcon.style.transform = 'translateY(0)';
+            let pos = result && result.lecfPos ? result.lecfPos : null;
+
+            // migration: if old saved shape used `left`, migrate it to `right`
+            if (pos && typeof pos.left === 'number' && typeof pos.right === 'undefined') {
+                pos = { right: pos.left, top: pos.top };
+                await chrome.storage.local.set({ lecfPos: pos });
+            }
+
+            if (pos) {
+                const { right, top } = pos;
+                if (typeof right === 'number') {
+                    this.floatingIcon.style.setProperty('right', right + 'px', 'important');
+                    this.floatingIcon.style.setProperty('left', 'auto', 'important');
+                } else {
+                    this.floatingIcon.style.setProperty('right', '12px', 'important');
+                    this.floatingIcon.style.setProperty('left', 'auto', 'important');
+                }
+                if (typeof top === 'number') {
+                    this.floatingIcon.style.top = top + 'px';
+                    this.floatingIcon.style.transform = 'translateY(0)';
+                }
+            } else {
+                // No saved pos — ensure right pinned
+                this.floatingIcon.style.setProperty('right', '12px', 'important');
+                this.floatingIcon.style.setProperty('left', 'auto', 'important');
             }
         } catch (error) {
             console.error('Error loading icon position:', error);
+            // fallback: ensure it's pinned right
+            this.floatingIcon.style.setProperty('right', '12px', 'important');
+            this.floatingIcon.style.setProperty('left', 'auto', 'important');
         }
     }
 
+    // --- addDragHandlers: only vertical moves (right fixed) and save { right, top } ---
     addDragHandlers() {
         let isDragging = false;
-        let startX = 0, startY = 0, startRight = 0, startTop = 0;
+        let startY = 0;
+        let startTop = 0;
+        let fixedRight = 12;
 
         const handleMouseDown = (e) => {
             isDragging = false;
-            startX = e.clientX;
             startY = e.clientY;
-            
-            const computedStyle = getComputedStyle(this.floatingIcon);
-            startRight = parseFloat(computedStyle.right) || 12;
-            startTop = parseFloat(computedStyle.top) || window.innerHeight / 2;
-            
+            const cs = getComputedStyle(this.floatingIcon);
+            startTop = parseFloat(cs.top) || (window.innerHeight / 2);
+            fixedRight = parseFloat(cs.right) || 12;
+
             const handleMouseMove = (ev) => {
-                const dx = ev.clientX - startX;
                 const dy = ev.clientY - startY;
-                
-                if (!isDragging && Math.hypot(dx, dy) > 4) {
-                    isDragging = true;
-                }
-                
+                if (!isDragging && Math.abs(dy) > 4) isDragging = true;
+
                 if (isDragging) {
-                    const newRight = Math.max(8, startRight - dx);
-                    const newTop = Math.max(8, Math.min(window.innerHeight - 44, startTop + dy));
-                    
-                    this.floatingIcon.style.right = `${newRight}px`;
+                    let newTop = Math.max(8, Math.min(window.innerHeight - 44, startTop + dy));
                     this.floatingIcon.style.top = `${newTop}px`;
+                    // keep it pinned to right and clear any left
+                    this.floatingIcon.style.setProperty('right', `${fixedRight}px`, 'important');
+                    this.floatingIcon.style.setProperty('left', 'auto', 'important');
                     this.floatingIcon.style.transform = 'translateY(0)';
                 }
             };
-            
-            const handleMouseUp = (ev) => {
+
+            const handleMouseUp = () => {
                 document.removeEventListener('mousemove', handleMouseMove);
                 document.removeEventListener('mouseup', handleMouseUp);
-                
+
                 if (isDragging) {
-                    // Persist position
-                    const finalRight = parseFloat(this.floatingIcon.style.right);
-                    const finalTop = parseFloat(this.floatingIcon.style.top);
+                    const finalRight = parseFloat(getComputedStyle(this.floatingIcon).right) || fixedRight;
+                    const finalTop = parseFloat(getComputedStyle(this.floatingIcon).top) || startTop;
                     chrome.storage.local.set({
                         lecfPos: { right: finalRight, top: finalTop }
                     });
                 } else {
-                    // Treat as click (toggle panel)
+                    // treat as click
                     this.togglePanel();
                 }
             };
-            
+
             document.addEventListener('mousemove', handleMouseMove);
             document.addEventListener('mouseup', handleMouseUp);
         };
 
-        // Touch handlers for mobile
+        // touch handlers for mobile (vertical only)
         const handleTouchStart = (e) => {
             isDragging = false;
             const touch = e.touches[0];
-            startX = touch.clientX;
             startY = touch.clientY;
-            
-            const computedStyle = getComputedStyle(this.floatingIcon);
-            startRight = parseFloat(computedStyle.right) || 12;
-            startTop = parseFloat(computedStyle.top) || window.innerHeight / 2;
-            
+            const cs = getComputedStyle(this.floatingIcon);
+            startTop = parseFloat(cs.top) || (window.innerHeight / 2);
+            fixedRight = parseFloat(cs.right) || 12;
+
             const handleTouchMove = (ev) => {
                 ev.preventDefault();
-                const touch = ev.touches[0];
-                const dx = touch.clientX - startX;
-                const dy = touch.clientY - startY;
-                
-                if (!isDragging && Math.hypot(dx, dy) > 4) {
-                    isDragging = true;
-                }
-                
+                const t = ev.touches[0];
+                const dy = t.clientY - startY;
+                if (!isDragging && Math.abs(dy) > 4) isDragging = true;
+
                 if (isDragging) {
-                    const newRight = Math.max(8, startRight - dx);
-                    const newTop = Math.max(8, Math.min(window.innerHeight - 44, startTop + dy));
-                    
-                    this.floatingIcon.style.right = `${newRight}px`;
+                    let newTop = Math.max(8, Math.min(window.innerHeight - 44, startTop + dy));
                     this.floatingIcon.style.top = `${newTop}px`;
+                    this.floatingIcon.style.setProperty('right', `${fixedRight}px`, 'important');
+                    this.floatingIcon.style.setProperty('left', 'auto', 'important');
                     this.floatingIcon.style.transform = 'translateY(0)';
                 }
             };
-            
-            const handleTouchEnd = (ev) => {
+
+            const handleTouchEnd = () => {
                 document.removeEventListener('touchmove', handleTouchMove);
                 document.removeEventListener('touchend', handleTouchEnd);
-                
+
                 if (isDragging) {
-                    // Persist position
-                    const finalRight = parseFloat(this.floatingIcon.style.right);
-                    const finalTop = parseFloat(this.floatingIcon.style.top);
+                    const finalRight = parseFloat(getComputedStyle(this.floatingIcon).right) || fixedRight;
+                    const finalTop = parseFloat(getComputedStyle(this.floatingIcon).top) || startTop;
                     chrome.storage.local.set({
                         lecfPos: { right: finalRight, top: finalTop }
                     });
                 } else {
-                    // Treat as click (toggle panel)
                     this.togglePanel();
                 }
             };
-            
+
             document.addEventListener('touchmove', handleTouchMove, { passive: false });
             document.addEventListener('touchend', handleTouchEnd);
         };
@@ -490,8 +509,8 @@ class LeetCodeCompanyFinder {
             </div>
         `;
 
-        // Add click handlers for company items
-        const companyItems = contentElement.querySelectorAll('.company-item');
+        // Add click handlers for company rows
+        const companyItems = contentElement.querySelectorAll('.company-row');
         companyItems.forEach(item => {
             item.addEventListener('click', () => {
                 const companyName = item.dataset.company;
@@ -551,9 +570,10 @@ class LeetCodeCompanyFinder {
         window.open(url, '_blank');
     }
 
+    // --- resetIconPosition: reset to right + vertically centered ---
     resetIconPosition() {
-        // Reset to default position
-        this.floatingIcon.style.right = '12px';
+        this.floatingIcon.style.setProperty('right', '12px', 'important');
+        this.floatingIcon.style.setProperty('left', 'auto', 'important');
         this.floatingIcon.style.top = '50%';
         this.floatingIcon.style.transform = 'translateY(-50%)';
         

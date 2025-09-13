@@ -7,7 +7,9 @@
     "test": "node test-slug-extraction.js",
     "build": "echo 'No build process required for Chrome extension'",
     "package": "powershell -Command \"Compress-Archive -Path .\\* -DestinationPath leetcode-company-finder.zip -Force\"",
-    "clean": "if exist leetcode-company-finder.zip del leetcode-company-finder.zip"
+    "clean": "if exist leetcode-company-finder.zip del leetcode-company-finder.zip",
+    "icons": "node scripts/generate-icons.js",
+    "verify-icons": "node -e \"const fs=require('fs');function dims(p){const b=fs.readFileSync(p);if(b.slice(12,16).toString()!=='IHDR'){throw new Error('Not a PNG with IHDR at expected location');}const w=b.readUInt32BE(16);const h=b.readUInt32BE(20);console.log(p+': '+w+'x'+h);}['icon-16.png','icon-48.png','icon-128.png'].forEach(p=>{try{dims(p);}catch(e){console.log(p+': ERROR '+e.message);}});\""
   },
   "keywords": [
     "chrome-extension",
@@ -32,7 +34,9 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {},
-  "dependencies": {},
+  "dependencies": {
+    "sharp": "^0.33.4"
+  },
   "manifest": {
     "version": 3,
     "permissions": ["storage"],
